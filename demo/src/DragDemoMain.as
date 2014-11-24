@@ -1,6 +1,5 @@
 package {
 
-import flash.display.InteractiveObject;
 import flash.display.Sprite;
 import flash.events.Event;
 
@@ -8,7 +7,6 @@ import nape.phys.Body;
 import nape.phys.BodyType;
 import nape.shape.Circle;
 import nape.shape.Polygon;
-
 import nape.space.Space;
 import nape.util.ShapeDebug;
 
@@ -22,8 +20,8 @@ import stork.nape.debug.NapeDebugDragNode;
 import stork.starling.StarlingPlugin;
 
 [SWF(width="800", height="600", backgroundColor="#333333", frameRate="60")]
-public class Main extends Sprite {
-    public function Main() {
+public class DragDemoMain extends Sprite {
+    public function DragDemoMain() {
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
     }
 

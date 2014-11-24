@@ -2,7 +2,7 @@
 <module type="Flex" version="4">
   <component name="FlexBuildConfigurationManager" active="StorkNapeDemo">
     <configurations>
-      <configuration name="StorkNapeDemo" target-platform="Desktop" pure-as="true" main-class="Main" output-file="Main.swf" output-folder="$MODULE_DIR$/out">
+      <configuration name="StorkNapeDemo" target-platform="Desktop" pure-as="true" main-class="DragDemoMain" output-file="Main.swf" output-folder="$MODULE_DIR$/out">
         <dependencies target-player="12.0">
           <entries>
             <entry module-name="Stork-Framework" build-configuration-name="Stork-Framework">
