@@ -40,8 +40,8 @@ public class CharacterDemoMain extends Sprite {
     private var _character:Body = new Body(BodyType.DYNAMIC);
     private var _characterMoveState:uint = 0;
 
-    private var _characterMoveMaterial:Material = new Material(0, 0, 0);
-    private var _characterStopMaterial:Material = new Material(0, 3, 3);
+    private var _characterMoveMaterial:Material = new Material(0, 0, 0);    // when moving, this material is used
+    private var _characterStopMaterial:Material = new Material(0, 3, 3);    // when not moving, this material is used to stop the character
 
     public function CharacterDemoMain() {
         addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
@@ -55,7 +55,10 @@ public class CharacterDemoMain extends Sprite {
         var loop:GameLoopNode = new GameLoopNode();
         scene.addNode(loop);
 
-        var space:NapeSpaceNode = new NapeSpaceNode(new Space(Vec2.weak(0, 1200)));
+        var s:Space = new Space(Vec2.weak(0, 1200));
+        s.worldLinearDrag = 0;  // so the character is not slowed down by the "air" resistance
+
+        var space:NapeSpaceNode = new NapeSpaceNode(s);
         scene.addNode(space);
 
         loop.addNode(space.action);
