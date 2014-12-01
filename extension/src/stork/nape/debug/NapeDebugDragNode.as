@@ -23,7 +23,7 @@ public class NapeDebugDragNode extends Node {
     private var _handDragX:Number;
     private var _handDragY:Number;
 
-    private var _mouseDragTarget:flash.display.DisplayObject;
+    private var _mouseDragTarget:DisplayObject;
 
     private var _spaceNode:NapeSpaceNode;
     private var _space:Space;
@@ -61,8 +61,8 @@ public class NapeDebugDragNode extends Node {
         }
     }
 
-    public function get mouseDragTarget():flash.display.DisplayObject { return _mouseDragTarget; }
-    public function set mouseDragTarget(value:flash.display.DisplayObject):void {
+    public function get mouseDragTarget():DisplayObject { return _mouseDragTarget; }
+    public function set mouseDragTarget(value:DisplayObject):void {
         if(_mouseDragTarget != null) {
             _mouseDragTarget.removeEventListener(MouseEvent.MOUSE_DOWN, onMouseDown, true);
             _mouseDragTarget.removeEventListener(MouseEvent.MOUSE_UP, onMouseUp, true);

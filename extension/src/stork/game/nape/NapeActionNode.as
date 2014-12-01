@@ -4,10 +4,9 @@
  * Time: 16:17
  */
 package stork.game.nape {
-import stork.game.*;
-
 import nape.space.Space;
 
+import stork.game.*;
 import stork.nape.NapeSpaceNode;
 import stork.nape.nape_internal;
 
