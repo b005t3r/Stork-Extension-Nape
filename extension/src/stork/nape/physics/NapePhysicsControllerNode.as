@@ -17,8 +17,6 @@ import stork.event.nape.NapeSpaceEvent;
 import stork.nape.*;
 
 public class NapePhysicsControllerNode extends Node {
-    private static const ACTIONS_KEY_NAME:String = "actionsNapeBodyControllerNode";
-
     private var _spaceNode:NapeSpaceNode;
     private var _space:Space;
 
@@ -26,7 +24,7 @@ public class NapePhysicsControllerNode extends Node {
     private var _constraints:List       = new ArrayList();  // list of all constraints acting on all non-excluded bodies
     private var _excludedBodies:List    = new ArrayList();  // list of sets (of bodies)
 
-    public function NapePhysicsControllerNode(name:String = "NapeBodyController") {
+    public function NapePhysicsControllerNode(name:String = "NapePhysicsController") {
         super(name);
     }
 
