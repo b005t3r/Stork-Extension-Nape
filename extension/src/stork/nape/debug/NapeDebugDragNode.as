@@ -7,6 +7,7 @@ package stork.nape.debug {
 
 import flash.display.DisplayObject;
 import flash.events.MouseEvent;
+import flash.geom.Point;
 
 import nape.constraint.PivotJoint;
 import nape.geom.Vec2;
@@ -28,7 +29,7 @@ public class NapeDebugDragNode extends Node {
     private var _spaceNode:NapeSpaceNode;
     private var _space:Space;
 
-    public function NapeDebugDragNode(name:String = "Node") {
+    public function NapeDebugDragNode(name:String = "NapeDebugDrag") {
         super(name);
     }
 
@@ -64,17 +65,17 @@ public class NapeDebugDragNode extends Node {
     public function get mouseDragTarget():DisplayObject { return _mouseDragTarget; }
     public function set mouseDragTarget(value:DisplayObject):void {
         if(_mouseDragTarget != null) {
-            _mouseDragTarget.removeEventListener(MouseEvent.MOUSE_DOWN, onMouseDown, true);
-            _mouseDragTarget.removeEventListener(MouseEvent.MOUSE_UP, onMouseUp, true);
-            _mouseDragTarget.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove, true);
+            _mouseDragTarget.stage.removeEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
+            _mouseDragTarget.stage.removeEventListener(MouseEvent.MOUSE_UP, onMouseUp);
+            _mouseDragTarget.stage.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
         }
 
         _mouseDragTarget = value;
 
         if(_mouseDragTarget != null) {
-            _mouseDragTarget.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown, true);
-            _mouseDragTarget.addEventListener(MouseEvent.MOUSE_UP, onMouseUp, true);
-            _mouseDragTarget.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove, true);
+            _mouseDragTarget.stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
+            _mouseDragTarget.stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
+            _mouseDragTarget.stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
         }
     }
 
@@ -84,19 +85,25 @@ public class NapeDebugDragNode extends Node {
     }
     */
 
-    private function onMouseDown(event:MouseEvent):void { beginDrag(event.localX, event.localY); }
+    private function onMouseDown(event:MouseEvent):void { beginDrag(event.stageX, event.stageY); }
     private function onMouseUp(event:MouseEvent):void { finishDrag(); }
     private function onMouseMove(event:MouseEvent):void {
         if(! _handJoint.active)
             return;
 
-        _handDragX = event.localX;
-        _handDragY = event.localY;
+        // TODO: use cached Points for better GC performance
+        var local:Point = _mouseDragTarget.globalToLocal(new Point(event.stageX, event.stageY));
+
+        _handDragX = local.x;
+        _handDragY = local.y;
     }
 
     private function beginDrag(x:Number, y:Number):void {
+        // TODO: use cached Points for better GC performance
+        var local:Point = _mouseDragTarget.globalToLocal(new Point(x, y));
+
         // Allocate a Vec2 from object pool.
-        var location:Vec2 = Vec2.get(x, y);
+        var location:Vec2 = Vec2.get(local.x, local.y);
 
         // Determine the set of Body's which are intersecting mouse point.
         // And search for any 'dynamic' type Body to begin dragging.
@@ -121,8 +128,8 @@ public class NapeDebugDragNode extends Node {
             // Enable hand joint!
             _handJoint.active = true;
 
-            _handDragX = x;
-            _handDragY = y;
+            _handDragX = local.x;
+            _handDragY = local.y;
 
             break;
         }
