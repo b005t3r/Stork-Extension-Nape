@@ -4,6 +4,7 @@
  * Time: 13:31
  */
 package stork.nape.physics {
+
 import medkit.collection.ArrayList;
 import medkit.collection.HashSet;
 import medkit.collection.List;
@@ -21,8 +22,10 @@ public class NapePhysicsControllerNode extends Node {
     private var _space:Space;
 
     private var _actions:List           = new ArrayList();  // list of all actions, each acting on one specific body
+    private var _activeBodies:List      = new ArrayList();  // list of sets (of bodies)
+
     private var _constraints:List       = new ArrayList();  // list of all constraints acting on all non-excluded bodies
-    private var _excludedBodies:List    = new ArrayList();  // list of sets (of bodies)
+    private var _constrainedBodies:List = new ArrayList();  // list of sets (of bodies)
 
     public function NapePhysicsControllerNode(name:String = "NapePhysicsController") {
         super(name);
@@ -48,87 +51,123 @@ public class NapePhysicsControllerNode extends Node {
 
     public function get actions():List { return _actions; }
 
-    public function addAction(body:Body, action:IAction):void {
-        if(body.space != _space) throw new ArgumentError("body is not a member of this controller's space");
-
-        if(! _actions.add(action))
-            return;
-
-        action.body = body;
+    public function addAction(action:IAction):void {
+        _actions.add(action);
+        _activeBodies.add(new HashSet());
     }
 
-    public function removeAction(body:Body, action:IAction):void {
+    public function removeAction(action:IAction):void {
+        var index:int = _actions.indexOf(action);
+
+        _actions.removeAt(index);
+        _activeBodies.removeAt(index);
+    }
+
+    // TODO: add notification handler to IAction
+    public function addActiveBody(body:Body, action:IAction):void {
         if(body.space != _space) throw new ArgumentError("body is not a member of this controller's space");
 
-        if(! _actions.remove(action))
-            return;
+        var index:int = _actions.indexOf(action);
 
-        action.body = null;
+        if(index < 0) throw new ArgumentError("action: '" + action + "' is not a part of this physics controller");
+
+        var bodies:Set = _activeBodies.get(index);
+        bodies.add(body.id);
+    }
+
+    public function removeActiveBody(body:Body, action:IAction):void {
+        if(body.space != _space) throw new ArgumentError("body is not a member of this controller's space");
+
+        var index:int = _actions.indexOf(action);
+
+        if(index < 0) throw new ArgumentError("action: '" + action + "' is not a part of this physics controller");
+
+        var bodies:Set = _activeBodies.get(index);
+        bodies.remove(body.id);
     }
 
     public function get constraints():List { return _constraints; }
 
     public function addConstraint(constraint:IConstraint):void {
         _constraints.add(constraint);
-        _excludedBodies.add(new HashSet());
+        _constrainedBodies.add(new HashSet());
     }
 
     public function removeConstraint(constraint:IConstraint):void {
         var index:int = _constraints.indexOf(constraint);
 
         _constraints.removeAt(index);
-        _excludedBodies.removeAt(index);
+        _constrainedBodies.removeAt(index);
     }
 
-    public function addExcludedBody(body:Body, constraint:IConstraint):void {
+    // TODO: add notification handler to IConstraint
+    public function addConstrainedBody(body:Body, constraint:IConstraint):void {
         if(body.space != _space) throw new ArgumentError("body is not a member of this controller's space");
 
         var index:int = _constraints.indexOf(constraint);
 
-        var bodies:Set = _excludedBodies.get(index);
+        if(index < 0) throw new ArgumentError("constraint: '" + constraint + "' is not a part of this physics controller");
+
+        var bodies:Set = _constrainedBodies.get(index);
         bodies.add(body.id);
     }
 
-    public function removeExcludedBody(body:Body, constraint:IConstraint):void {
+    public function removeConstrainedBody(body:Body, constraint:IConstraint):void {
         if(body.space != _space) throw new ArgumentError("body is not a member of this controller's space");
 
         var index:int = _constraints.indexOf(constraint);
 
-        var bodies:Set = _excludedBodies.get(index);
+        if(index < 0) throw new ArgumentError("constraint: '" + constraint + "' is not a part of this physics controller");
+
+        var bodies:Set = _constrainedBodies.get(index);
         bodies.remove(body.id);
     }
 
     private function onPreUpdate(event:NapeSpaceEvent):void {
-        var actionCount:int = _actions.size();
-        for(var i:int = 0; i < actionCount; ++i) {
-            var action:IAction = _actions.get(i);
+        var totalBodyCount:int = _space.bodies.length;
 
-            if(! action.active)
+        var actionCount:int = _actions.size();
+        for(var i:int = 0; i < totalBodyCount; ++i) {
+            var actionBody:Body = _space.bodies.at(i);
+
+            if(! actionBody.isDynamic())
                 continue;
 
-            action.perform(this);
+            for(var j:int = 0; j < actionCount; ++j) {
+                var action:IAction = _actions.get(j);
+
+                if(! action.active)
+                    continue;
+
+                var active:Set = _activeBodies.get(j);
+
+                if(! active.contains(actionBody.id))
+                    continue;
+
+                action.perform(actionBody, this);
+            }
         }
 
-        var constrainCount:int  = _constraints.size();
-        var bodyCount:int       = _space.bodies.length;
-        for(var k:int = 0; k < bodyCount; ++k) {
-            var body:Body = _space.bodies.at(k);
+        var constrainCount:int = _constraints.size();
 
-            if(! body.isDynamic())
+        for(var k:int = 0; k < totalBodyCount; ++k) {
+            var constrainedBody:Body = _space.bodies.at(k);
+
+            if(! constrainedBody.isDynamic())
                 continue;
 
-            for(var j:int = 0; j < constrainCount; ++j) {
-                var constraint:IConstraint = _constraints.get(j);
+            for(var p:int = 0; p < constrainCount; ++p) {
+                var constraint:IConstraint = _constraints.get(p);
 
                 if(! constraint.active)
                     continue;
 
-                var excluded:Set = _excludedBodies.get(j);
+                var constrained:Set = _constrainedBodies.get(p);
 
-                if(excluded.contains(body.id))
+                if(constrained.contains(constrainedBody.id))
                     continue;
 
-                constraint.apply(body, this);
+                constraint.apply(constrainedBody, this);
             }
         }
     }
