@@ -21,11 +21,11 @@ public class NapePhysicsControllerNode extends Node {
     private var _spaceNode:NapeSpaceNode;
     private var _space:Space;
 
-    private var _actions:List           = new ArrayList();  // list of all actions, each acting on one specific body
-    private var _activeBodies:List      = new ArrayList();  // list of sets (of bodies)
+    private var _actions:List               = new ArrayList();  // list of all actions, each acting on one specific body
+    private var _activeBodies:List          = new ArrayList();  // list of sets (of bodies)
 
-    private var _constraints:List       = new ArrayList();  // list of all constraints acting on all non-excluded bodies
-    private var _constrainedBodies:List = new ArrayList();  // list of sets (of bodies)
+    private var _constraints:List           = new ArrayList();  // list of all constraints acting on all non-excluded bodies
+    private var _unconstrainedBodies:List   = new ArrayList();  // list of sets (of bodies)
 
     public function NapePhysicsControllerNode(name:String = "NapePhysicsController") {
         super(name);
@@ -90,36 +90,36 @@ public class NapePhysicsControllerNode extends Node {
 
     public function addConstraint(constraint:IConstraint):void {
         _constraints.add(constraint);
-        _constrainedBodies.add(new HashSet());
+        _unconstrainedBodies.add(new HashSet());
     }
 
     public function removeConstraint(constraint:IConstraint):void {
         var index:int = _constraints.indexOf(constraint);
 
         _constraints.removeAt(index);
-        _constrainedBodies.removeAt(index);
+        _unconstrainedBodies.removeAt(index);
     }
 
     // TODO: add notification handler to IConstraint
-    public function addConstrainedBody(body:Body, constraint:IConstraint):void {
+    public function addUnconstrainedBody(body:Body, constraint:IConstraint):void {
         if(body.space != _space) throw new ArgumentError("body is not a member of this controller's space");
 
         var index:int = _constraints.indexOf(constraint);
 
         if(index < 0) throw new ArgumentError("constraint: '" + constraint + "' is not a part of this physics controller");
 
-        var bodies:Set = _constrainedBodies.get(index);
+        var bodies:Set = _unconstrainedBodies.get(index);
         bodies.add(body.id);
     }
 
-    public function removeConstrainedBody(body:Body, constraint:IConstraint):void {
+    public function removeUnconstrainedBody(body:Body, constraint:IConstraint):void {
         if(body.space != _space) throw new ArgumentError("body is not a member of this controller's space");
 
         var index:int = _constraints.indexOf(constraint);
 
         if(index < 0) throw new ArgumentError("constraint: '" + constraint + "' is not a part of this physics controller");
 
-        var bodies:Set = _constrainedBodies.get(index);
+        var bodies:Set = _unconstrainedBodies.get(index);
         bodies.remove(body.id);
     }
 
@@ -162,7 +162,7 @@ public class NapePhysicsControllerNode extends Node {
                 if(! constraint.active)
                     continue;
 
-                var constrained:Set = _constrainedBodies.get(p);
+                var constrained:Set = _unconstrainedBodies.get(p);
 
                 if(constrained.contains(constrainedBody.id))
                     continue;
