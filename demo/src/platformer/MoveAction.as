@@ -5,6 +5,7 @@
  */
 package platformer {
 import nape.geom.Vec2;
+import nape.phys.Body;
 
 import stork.nape.physics.Action;
 import stork.nape.physics.NapePhysicsControllerNode;
@@ -16,8 +17,8 @@ public class MoveAction extends Action {
         _maxImpulse = maxImpulse;
     }
 
-    override public function perform(controller:NapePhysicsControllerNode):void {
-        _body.applyImpulse(Vec2.weak(_maxImpulse * _ratio, 0));
+    override public function perform(body:Body, controller:NapePhysicsControllerNode):void {
+        body.applyImpulse(Vec2.weak(_maxImpulse * body.userData.moveRatio, 0));
     }
 }
 }

@@ -85,8 +85,10 @@ public class PlatformerDemoMain extends Sprite {
         var bodyController:NapePhysicsControllerNode = new NapePhysicsControllerNode();
         scene.addNode(bodyController);
 
-        bodyController.addAction(_character, _moveAction);
-        bodyController.addAction(_character, _jumpAction);
+        bodyController.addAction(_moveAction);
+        bodyController.addAction(_jumpAction);
+        bodyController.addActiveBody(_character, _moveAction);
+        bodyController.addActiveBody(_character, _jumpAction);
         bodyController.addConstraint(_dragConstraint);
         bodyController.addConstraint(_maxVelocityConstraint);
 
@@ -126,17 +128,15 @@ public class PlatformerDemoMain extends Sprite {
 
         if(deviceControl.id == "AXIS_1") {
             if(Math.abs(value) < 0.01) {
-                _moveAction.deactivate();
-                _dragConstraint.active = true;
+                _character.userData.moveRatio = 0;
             }
             else {
-                _moveAction.activate(value);
-                _dragConstraint.active = false;
+                _character.userData.moveRatio = value;
             }
         }
 
         if(deviceControl.id == "BUTTON_9" && value > 0) {
-            _jumpAction.activate(1);
+            _character.userData.jumpRatio = 1;
         }
     }
 
@@ -158,12 +158,12 @@ public class PlatformerDemoMain extends Sprite {
         switch(event.keyCode) {
             case Keyboard.LEFT:
             case Keyboard.RIGHT:
-                _moveAction.deactivate();
-                _dragConstraint.active = true;
+                _character.userData.moveRatio = 0;
                 break;
 
             case Keyboard.UP:
             case Keyboard.SPACE:
+                _character.userData.jumpRatio = 0;
                 break;
         }
     }
@@ -171,18 +171,16 @@ public class PlatformerDemoMain extends Sprite {
     private function onKeyDown(event:KeyboardEvent):void {
         switch(event.keyCode) {
             case Keyboard.LEFT:
-                _moveAction.activate(-1);
-                _dragConstraint.active = false;
+                _character.userData.moveRatio = -1;
                 break;
 
             case Keyboard.RIGHT:
-                _moveAction.activate(1);
-                _dragConstraint.active = false;
+                _character.userData.moveRatio = 1;
                 break;
 
             case Keyboard.UP:
             case Keyboard.SPACE:
-                _jumpAction.activate(1);
+                _character.userData.jumpRatio = 1;
                 break;
         }
     }
@@ -227,6 +225,10 @@ public class PlatformerDemoMain extends Sprite {
         _character.setShapeMaterials(Materials.characterMaterial());
         _character.space = space;
         _character.cbTypes.add(JumpAction.CHARACTER);
+
+        _character.userData.moveRatio   = 0;
+        _character.userData.jumpRatio   = 0;
+        _character.userData.canJump     = false;
     }
 }
 }

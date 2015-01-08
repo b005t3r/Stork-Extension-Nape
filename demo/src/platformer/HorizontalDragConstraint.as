@@ -20,7 +20,7 @@ public class HorizontalDragConstraint extends Constraint {
     override public function apply(body:Body, controller:NapePhysicsControllerNode):void {
         var vel:Number = body.velocity.x;
 
-        if(vel == 0)
+        if(vel == 0 || body.userData.moveRatio != 0)
             return;
 
         var sign:Number = Math.abs(vel) / vel;

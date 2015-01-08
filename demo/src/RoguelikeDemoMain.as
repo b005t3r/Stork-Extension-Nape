@@ -83,7 +83,8 @@ public class RoguelikeDemoMain extends Sprite {
         var bodyController:NapePhysicsControllerNode = new NapePhysicsControllerNode();
         scene.addNode(bodyController);
 
-        bodyController.addAction(_character, _moveAction);
+        bodyController.addAction(_moveAction);
+        bodyController.addActiveBody(_character, _moveAction);
         bodyController.addConstraint(_dragConstraint);
         bodyController.addConstraint(_maxVelocityConstraint);
 
@@ -125,16 +126,16 @@ public class RoguelikeDemoMain extends Sprite {
 
         if(deviceControl.id == "AXIS_1") {
             if(Math.abs(value) < 0.01)
-                _moveAction.direction.x = 0;
+                _character.userData.moveVector.x = 0;
             else
-                _moveAction.direction.x = value;
+                _character.userData.moveVector.x = value;
         }
 
         if(deviceControl.id == "AXIS_2") {
             if(Math.abs(value) < 0.01)
-                _moveAction.direction.y = 0;
+                _character.userData.moveVector.y = 0;
             else
-                _moveAction.direction.y = value;
+                _character.userData.moveVector.y = value;
         }
 
         if(deviceControl.id == "BUTTON_9") {
@@ -148,14 +149,8 @@ public class RoguelikeDemoMain extends Sprite {
             }
         }
 
-        if(_moveAction.direction.length > 0) {
-            _moveAction.activate((_moveAction.direction.length > 1 ? 1 : _moveAction.direction.length) * _ratioModifier);
-            //_dragConstraint.active = false;
-        }
-        else {
-            _moveAction.deactivate();
-            _dragConstraint.active = true;
-        }
+        if(_character.userData.moveVector.length > 0)
+            _character.userData.moveVector.length = _character.userData.moveVector.length * _ratioModifier
     }
 
     private function onDeviceRemoved(event:GameInputEvent):void {
@@ -176,20 +171,12 @@ public class RoguelikeDemoMain extends Sprite {
         switch(event.keyCode) {
             case Keyboard.LEFT:
             case Keyboard.RIGHT:
-                _moveAction.direction.x = 0;
-                if(_moveAction.direction.length == 0) {
-                    _moveAction.deactivate();
-                    _dragConstraint.active = true;
-                }
+                _character.userData.moveVector.x = 0;
                 break;
 
             case Keyboard.UP:
             case Keyboard.DOWN:
-                _moveAction.direction.y = 0;
-                if(_moveAction.direction.length == 0) {
-                    _moveAction.deactivate();
-                    _dragConstraint.active = true;
-                }
+                _character.userData.moveVector.y = 0;
                 break;
         }
     }
@@ -197,27 +184,19 @@ public class RoguelikeDemoMain extends Sprite {
     private function onKeyDown(event:KeyboardEvent):void {
         switch(event.keyCode) {
             case Keyboard.LEFT:
-                _moveAction.direction.x = -1;
-                _moveAction.activate();
-                _dragConstraint.active = false;
+                _character.userData.moveVector.x = -1;
                 break;
 
             case Keyboard.RIGHT:
-                _moveAction.direction.x = 1;
-                _moveAction.activate();
-                _dragConstraint.active = false;
+                _character.userData.moveVector.x = 1;
                 break;
 
             case Keyboard.UP:
-                _moveAction.direction.y = -1;
-                _moveAction.activate();
-                _dragConstraint.active = false;
+                _character.userData.moveVector.y = -1;
                 break;
 
             case Keyboard.DOWN:
-                _moveAction.direction.y = 1;
-                _moveAction.activate();
-                _dragConstraint.active = false;
+                _character.userData.moveVector.y = 1;
                 break;
         }
     }
@@ -251,6 +230,7 @@ public class RoguelikeDemoMain extends Sprite {
         _character.position.setxy(w / 2, h / 2);
         _character.allowRotation = false;
         _character.space = space;
+        _character.userData.moveVector = Vec2.get();
         //_character.cbTypes.add(CHARACTER);
 
         //space.listeners.add(_landingListener);

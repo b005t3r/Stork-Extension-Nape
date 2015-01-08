@@ -18,7 +18,7 @@ public class DragConstraint extends Constraint {
     }
 
     override public function apply(body:Body, controller:NapePhysicsControllerNode):void {
-        if(body.velocity.length == 0)
+        if(body.velocity.length == 0 || body.userData.moveVector.length != 0)
             return;
 
         var oldVelocity:Vec2    = Vec2.get(body.velocity.x, body.velocity.y);

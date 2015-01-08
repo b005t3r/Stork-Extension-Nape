@@ -22,42 +22,34 @@ public class JumpAction extends Action {
 
     private var _maxImpulse:Number;
 
-    private var _canJump:Boolean                        = false;
-    private var _landingListener:InteractionListener    = new InteractionListener(CbEvent.ONGOING, InteractionType.COLLISION, CHARACTER, FLOOR, onLanded);
-    private var _jumpListener:InteractionListener       = new InteractionListener(CbEvent.END, InteractionType.COLLISION, CHARACTER, FLOOR, onJumped);
+    private var _landingListener:InteractionListener;
+    private var _jumpListener:InteractionListener;
 
     public function JumpAction(maxImpulse:Number = 100) {
         _maxImpulse = maxImpulse;
     }
 
-    override public function set body(value:Body):void {
-        if(_body != null) {
-            _body.space.listeners.remove(_landingListener);
-            _body.space.listeners.remove(_jumpListener);
+    override public function perform(body:Body, controller:NapePhysicsControllerNode):void {
+        if(_landingListener == null && _jumpListener == null) {
+            _landingListener = new InteractionListener(CbEvent.ONGOING, InteractionType.COLLISION, CHARACTER, FLOOR, onLanded);
+            _jumpListener = new InteractionListener(CbEvent.END, InteractionType.COLLISION, CHARACTER, FLOOR, onJumped);
+
+            body.space.listeners.add(_landingListener);
+
+            body.userData.canJump = false;
         }
 
-        super.body = value;
-
-        if(_body != null) {
-            _body.space.listeners.add(_landingListener);
-        }
-    }
-
-    override public function perform(controller:NapePhysicsControllerNode):void {
-        if(! _canJump) {
-            deactivate();
+        if(! body.userData.canJump || body.userData.jumpRatio == 0)
             return;
-        }
 
-        _body.applyImpulse(Vec2.weak(0, -_maxImpulse * _ratio));
-
-        _canJump = false;
-        deactivate();
+        body.applyImpulse(Vec2.weak(0, -_maxImpulse));
+        body.userData.canJump = false;
     }
 
     private function onLanded(callback:InteractionCallback):void {
-        var count:int = callback.arbiters.length;
+        var body:Body = callback.int1 as Body;
 
+        var count:int = callback.arbiters.length;
         for(var i:int = 0; i < count; ++i) {
             var arbiter:CollisionArbiter = callback.arbiters.at(i) as CollisionArbiter;
 
@@ -69,10 +61,10 @@ public class JumpAction extends Action {
                 continue;
 
             //trace("lands");
-            _canJump = true;
+            body.userData.canJump = true;
 
-            _body.space.listeners.remove(_landingListener);
-            _body.space.listeners.add(_jumpListener);
+            body.space.listeners.remove(_landingListener);
+            body.space.listeners.add(_jumpListener);
             break;
         }
     }
@@ -80,8 +72,10 @@ public class JumpAction extends Action {
     private function onJumped(callback:InteractionCallback):void {
         //trace("jumps");
 
-        _body.space.listeners.remove(_jumpListener);
-        _body.space.listeners.add(_landingListener);
+        var body:Body = callback.int1 as Body;
+
+        body.space.listeners.remove(_jumpListener);
+        body.space.listeners.add(_landingListener);
     }
 }
 }
