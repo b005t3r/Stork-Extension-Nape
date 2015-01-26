@@ -17,10 +17,10 @@
             <entry module-name="MedKit" build-configuration-name="MedKit">
               <dependency linkage="Merged" />
             </entry>
-            <entry module-name="Starling" build-configuration-name="Starling">
+            <entry library-id="3137ab0a-7528-4c47-ae64-749b6eebec2f">
               <dependency linkage="Merged" />
             </entry>
-            <entry library-id="3137ab0a-7528-4c47-ae64-749b6eebec2f">
+            <entry module-name="starling" build-configuration-name="starling">
               <dependency linkage="Merged" />
             </entry>
           </entries>
@@ -43,7 +43,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="Stork-Framework" exported="" />
     <orderEntry type="module" module-name="MedKit" exported="" />
-    <orderEntry type="module" module-name="Starling" exported="" />
     <orderEntry type="module" module-name="Stork-Plugin-Starling" exported="" />
     <orderEntry type="module" module-name="Stork-Extension-Nape" exported="" />
     <orderEntry type="module-library" exported="">
@@ -56,6 +55,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module" module-name="starling" exported="" />
   </component>
 </module>
 
