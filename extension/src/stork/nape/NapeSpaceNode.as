@@ -36,7 +36,7 @@ public class NapeSpaceNode extends Node {
 
     public function get action():NapeActionNode { return _action; }
 
-    nape_internal function dispatchPreUpdateEvent():void { dispatchEvent(_preUpdateEvent.reset()); }
-    nape_internal function dispatchPostUpdateEvent():void { dispatchEvent(_postUpdateEvent.reset()); }
+    nape_internal function dispatchPreUpdateEvent(dt:Number):void { dispatchEvent(_preUpdateEvent.resetEvent(dt)); }
+    nape_internal function dispatchPostUpdateEvent(dt:Number):void { dispatchEvent(_postUpdateEvent.resetEvent(dt)); }
 }
 }

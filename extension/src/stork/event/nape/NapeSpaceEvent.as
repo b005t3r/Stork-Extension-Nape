@@ -12,10 +12,19 @@ public class NapeSpaceEvent extends Event {
     public static const PRE_UPDATE:String   = "preUpdateNapeSpaceEvent";
     public static const POST_UPDATE:String  = "postUpdateNapeSpaceEvent";
 
+    private var _dt:Number;
+
     public function NapeSpaceEvent(type:String) {
         super(type, false);
     }
 
     public function get space():NapeSpaceNode { return target as NapeSpaceNode; }
+    public function get dt():Number { return _dt; }
+
+    public function resetEvent(dt:Number):NapeSpaceEvent {
+        _dt = dt;
+
+        return reset() as NapeSpaceEvent;
+    }
 }
 }
