@@ -124,10 +124,10 @@ public class PlatformerDemoMain extends Sprite {
         var deviceControl:GameInputControl = event.target as GameInputControl;
         var value:Number = deviceControl.value;
 
-        trace(deviceControl.id, ": ", deviceControl.value);
+        //trace(deviceControl.id, ": ", deviceControl.value);
 
-        if(deviceControl.id == "AXIS_1") {
-            if(Math.abs(value) < 0.01) {
+        if(deviceControl.id == "AXIS_0") {
+            if(Math.abs(value) < 0.075) {
                 _character.userData.moveRatio = 0;
             }
             else {
@@ -135,9 +135,8 @@ public class PlatformerDemoMain extends Sprite {
             }
         }
 
-        if(deviceControl.id == "BUTTON_9" && value > 0) {
-            _character.userData.jumpRatio = 1;
-        }
+        if(deviceControl.id == "BUTTON_17")
+            _character.userData.jumpRatio = value > 0;
     }
 
     private function onDeviceRemoved(event:GameInputEvent):void {

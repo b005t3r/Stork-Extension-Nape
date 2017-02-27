@@ -124,15 +124,15 @@ public class RoguelikeDemoMain extends Sprite {
 
         //trace(deviceControl.id, ": ", deviceControl.value);
 
-        if(deviceControl.id == "AXIS_1") {
-            if(Math.abs(value) < 0.01)
+        if(deviceControl.id == "AXIS_0") {
+            if(Math.abs(value) < 0.075)
                 _character.userData.moveVector.x = 0;
             else
                 _character.userData.moveVector.x = value;
         }
 
-        if(deviceControl.id == "AXIS_2") {
-            if(Math.abs(value) < 0.01)
+        if(deviceControl.id == "AXIS_1") {
+            if(Math.abs(value) < 0.075)
                 _character.userData.moveVector.y = 0;
             else
                 _character.userData.moveVector.y = value;
